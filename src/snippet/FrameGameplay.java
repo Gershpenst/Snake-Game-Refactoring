@@ -12,8 +12,8 @@ public class FrameGameplay extends JFrame {
         this.setBounds(10,10,905,700);
         this.setBackground(Color.DARK_GRAY);
         this.setResizable(false);
-        // obj.setVisible(true);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.add(gameplay);
         this.setVisible(true);
     }

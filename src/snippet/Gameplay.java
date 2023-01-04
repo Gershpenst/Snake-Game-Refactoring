@@ -9,40 +9,41 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.*;
 
 public class Gameplay extends JPanel implements KeyListener, ActionListener
 {
-    public final int LIMIT_WIDTH_BOARD = 850;
-    private final int LIMIT_HEIGHT_BOARD = 625;
+    public static final int LIMIT_WIDTH_BOARD = 850;
+    private static final int LIMIT_HEIGHT_BOARD = 625;
 
-    private final Snake snake;
-    private final int lengthOfSnake;
-    private Food food;
+    private final transient Snake snake;
+    private final int resetLengthOfSnake;
+    private transient Food food;
 
     private final Map<String, ImageIcon> images = Map.ofEntries(
-            Map.entry(ImageEntity.SNAKE.name(), new ImageIcon(Main.class.getResource("/resources/snake.png"))),
-            Map.entry(ImageEntity.APPLE.name(), new ImageIcon(Main.class.getResource("/resources/apple.png"))),
-            Map.entry(ImageEntity.RANDOM.name(), new ImageIcon(Main.class.getResource("/resources/random.png")))
+            Map.entry(ImageEntity.SNAKE.name(), new ImageIcon(Objects.requireNonNull(Main.class.getResource("/resources/snake.png")))),
+            Map.entry(ImageEntity.APPLE.name(), new ImageIcon(Objects.requireNonNull(Main.class.getResource("/resources/apple.png")))),
+            Map.entry(ImageEntity.RANDOM.name(), new ImageIcon(Objects.requireNonNull(Main.class.getResource("/resources/random.png"))))
     );
 
     private Timer timer = null;
     private final int delay;
     private int score = 0;
 
-    Font font_arial_14 = new Font("arial",Font.PLAIN, 14);
-    Font font_game_over = new Font("Times",Font.BOLD, 50);
-    Font font_restart_game = new Font("Times",Font.BOLD, 20);
+    Font fontArial = new Font("arial",Font.PLAIN, 14);
+    Font fontGameOver = new Font("Times",Font.BOLD, 50);
+    Font fontRestartGame = new Font("Times",Font.BOLD, 20);
 
-    private final Point init_snake;
+    private final Point initSnake;
 
-    private Boolean isGameOver = false;
+    private boolean isGameOver = false;
 
-    public Gameplay(int x, int y, int step, int length_snake, int delay) {
-        this.init_snake = new Point(x, y);
+    public Gameplay(int x, int y, int step, int lengthSnake, int delay) {
+        this.initSnake = new Point(x, y);
 
         this.snake = new Snake(step);
-        this.lengthOfSnake = length_snake;
+        this.resetLengthOfSnake = lengthSnake;
 
         this.food = FoodFactory.createFood();
 
@@ -55,7 +56,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener
     }
 
     public void resetGame() {
-        this.snake.initSnake(this.init_snake, this.lengthOfSnake, Directions.RIGHT);
+        this.snake.initSnake(this.initSnake, this.resetLengthOfSnake, Directions.RIGHT);
         score = 0;
         isGameOver = false;
     }
@@ -102,11 +103,11 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener
         //draw scores
         g.clearRect(780, 20, 75, 35);
         g.setColor(Color.WHITE);
-        g.setFont(font_arial_14);
+        g.setFont(fontArial);
         g.drawString("Scores: "+score, 780, 30);
 
         g.setColor(Color.WHITE);
-        g.setFont(font_arial_14);
+        g.setFont(fontArial);
         g.drawString("Length: "+this.snake.getSize(), 780, 50);
     }
 
@@ -134,15 +135,16 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener
     public void drawEndGame(Graphics g) {
         if(isGameOver) {
             g.setColor(Color.WHITE);
-            g.setFont(font_game_over);
+            g.setFont(fontGameOver);
             g.drawString("GAME OVER", 300, 300);
 
-            g.setFont(font_restart_game);
+            g.setFont(fontRestartGame);
             g.drawString("Press Space to Restart", 350, 340);
             this.stopGame();
         }
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         this.drawHeaderGameplay(g);
         this.drawBoard(g);
@@ -153,47 +155,35 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener
     }
 
     @Override
-    public void keyTyped(KeyEvent ke) {
+    public void keyTyped(KeyEvent ke) {}
 
-    }
+    @Override
+    public void keyReleased(KeyEvent ke) {}
 
     @Override
     public void keyPressed(KeyEvent e)
     {
         // Move the snake !
         // Cannot go the opposite way when moving
-        Directions position_head = this.snake.getHead().getActualDirection();
+        Directions positionHead = this.snake.getHead().getActualDirection();
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_RIGHT:
-                this.snake.setNextDirectionFromUserInput(position_head.equals(Directions.LEFT) ? this.snake.getNextDirectionFromUserInput() : Directions.RIGHT);
-                break;
-            case KeyEvent.VK_LEFT:
-                this.snake.setNextDirectionFromUserInput(position_head.equals(Directions.RIGHT) ? this.snake.getNextDirectionFromUserInput() : Directions.LEFT);
-                break;
-            case KeyEvent.VK_UP:
-                this.snake.setNextDirectionFromUserInput(position_head.equals(Directions.DOWN) ? this.snake.getNextDirectionFromUserInput() : Directions.UP);
-                break;
-            case KeyEvent.VK_DOWN:
-                this.snake.setNextDirectionFromUserInput(position_head.equals(Directions.UP) ? this.snake.getNextDirectionFromUserInput() : Directions.DOWN);
-                break;
-            case KeyEvent.VK_SPACE:
+            case KeyEvent.VK_RIGHT ->
+                    this.snake.setNextDirectionFromUserInput(positionHead.equals(Directions.LEFT) ? this.snake.getNextDirectionFromUserInput() : Directions.RIGHT);
+            case KeyEvent.VK_LEFT ->
+                    this.snake.setNextDirectionFromUserInput(positionHead.equals(Directions.RIGHT) ? this.snake.getNextDirectionFromUserInput() : Directions.LEFT);
+            case KeyEvent.VK_UP ->
+                    this.snake.setNextDirectionFromUserInput(positionHead.equals(Directions.DOWN) ? this.snake.getNextDirectionFromUserInput() : Directions.UP);
+            case KeyEvent.VK_DOWN ->
+                    this.snake.setNextDirectionFromUserInput(positionHead.equals(Directions.UP) ? this.snake.getNextDirectionFromUserInput() : Directions.DOWN);
+            case KeyEvent.VK_SPACE -> {
                 this.resetGame();
                 this.startGame();
                 repaint();
-                break;
-            case KeyEvent.VK_ESCAPE:
-                System.exit(0);
-                break;
-            default:
-                break;
+            }
+            case KeyEvent.VK_ESCAPE -> System.exit(0);
+            default -> {}
         }
     }
-
-    @Override
-    public void keyReleased(KeyEvent ke) {
-    }
-
-
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -209,7 +199,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener
 
         // Game over when snake has eaten itself
         this.isGameOver = this.findIfGameOver();
-
         repaint();
     }
 }

@@ -9,9 +9,9 @@ public class PartSnake {
     private Point coord;
     private Directions actualDirection;
 
-    public PartSnake(Point coord, Directions snake_dir) {
+    public PartSnake(Point coord, Directions snakeDir) {
         this.coord = coord;
-        this.actualDirection = snake_dir;
+        this.actualDirection = snakeDir;
     }
 
     public Point getCoord() {

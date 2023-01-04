@@ -1,3 +1,0 @@
-# Snake-Game
-IMPLEMENTATION OF SNAKE GAME IN JAVA WITH ANIMATIONS AND GRAPHICS 
-run Main.java to execute the game
